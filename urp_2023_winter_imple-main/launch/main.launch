@@ -1,0 +1,43 @@
+<launch>
+    <!-- lidar pcl -->
+    <node pkg="push_plz" type="lidar_pcl_parser.py" name="lidar_pcl_parser" output="screen">
+    </node>
+
+    <!-- Lane detect -->
+    <node pkg='push_plz' type="lane_detect.py" name="lane_detect_node" output="screen">
+    </node>
+
+    <!-- Main node-->
+    <node pkg='push_plz' type="main.py" name="main_node" output="screen">
+    </node>
+
+    <!-- run pointcloud_to_laserscan node -->
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        
+        <!-- <remap from="cloud_in" to="/velodyne_points_ROI" /> -->
+        <remap from="cloud_in" to="/lidar3D_ROI"/>
+        <remap from="scan" to="/scan"/>
+        <rosparam>
+            target_frame: velodyne # Leave disabled to output scan in pointcloud frame
+            transform_tolerance: 0.01
+            min_height: -0.9
+            max_height: 2.0
+
+            angle_min: -3.1415 # -M_PI
+            angle_max: 3.1415 # M_PI
+            angle_increment: 0.0174 # 2*M_PI/360.0
+            scan_time: 0.3333
+            range_min: 0.45
+            range_max: 20.0
+            use_inf: true
+            inf_epsilon: 1.0
+
+            # Concurrency level, affects number of pointclouds queued for processing and number of threads used
+            # 0 : Detect number of cores
+            # 1 : Single threaded
+            # 2-> inf : Parallelism level
+            concurrency_level: 1
+        </rosparam>
+
+    </node>
+</launch>
